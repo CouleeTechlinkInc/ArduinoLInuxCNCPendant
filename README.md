@@ -1,6 +1,6 @@
 # ArduinoPendant
 
-This is an arduino LinuxCNC Pendant based on (This Project)[http://www.mgware.co.uk/LinuxCNC/arduino-pendant.html]
+This is an arduino LinuxCNC Pendant inspired by http://www.mgware.co.uk/LinuxCNC/arduino-pendant.html ( but no resued code because I like mit better then gpl )
 
 Parts of the project
 * Arduino Code
