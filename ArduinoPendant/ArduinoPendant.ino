@@ -1,5 +1,6 @@
 #include "U8glib.h"
 #include <string.h>
+#include <Encoder.h>
 
 U8GLIB_ST7920_128X64_1X u8g(8, 9, 10);	// SPI Com: SCK = en = 18, MOSI = rw = 16, CS = di = 17
 
@@ -15,6 +16,13 @@ int zPos = 0;
 int writtenX = 0;
 int writtenY = 0;
 int writtenZ = 0;
+
+long oldPosition  = -999;
+int accel = 2;
+
+Encoder xEncoder(2, 3);
+Encoder yEncoder(2, 3);
+
 
 void draw(void) {
   char charPos[8];
@@ -46,72 +54,23 @@ void updateScreen(){
     draw();
   } while( u8g.nextPage() );
 }
+void EncoderLoop(){
+  long newPosition = xEncoder.read() / accel;
+  xPos = xPos + ( newPosition - oldPosition ); 
+  oldPosition = newPosition;
+}
 
 void setup(void) {
-  pinMode(encoder0PinA, INPUT); 
-    u8g.setColorIndex(1);       
+  u8g.setColorIndex(1);       
   pinMode( 13 , OUTPUT );
-  attachInterrupt(0, doEncoderA, CHANGE);
-  attachInterrupt(1, doEncoderB, CHANGE);
   updateScreen();
 }
 
 void loop(void) {
-  
-  if( xPos !== writtenX ){
+  EncoderLoop();
+  if( xPos != writtenX ){
     updateScreen();  
   }
-  // rebuild the picture after some delay
 }
 
-
-void doEncoderA(){
-
-  // look for a low-to-high on channel A
-  if (digitalRead(encoder0PinA) == HIGH) { 
-    // check channel B to see which way encoder is turning
-    if (digitalRead(encoder0PinB) == LOW) {  
-      xPos = xPos + 1;         // CW
-    } 
-    else {
-      xPos = xPos - 1;         // CCW
-    }
-  }
-  else   // must be a high-to-low edge on channel A                                       
-  { 
-    // check channel B to see which way encoder is turning  
-    if (digitalRead(encoder0PinB) == HIGH) {   
-      xPos = xPos + 1;          // CW
-    } 
-    else {
-      xPos = xPos - 1;          // CCW
-    }
-  }
-  
-  // use for debugging - remember to comment out
-}
-
-void doEncoderB(){
-
-  // look for a low-to-high on channel B
-  if (digitalRead(encoder0PinB) == HIGH) {   
-   // check channel A to see which way encoder is turning
-    if (digitalRead(encoder0PinA) == HIGH) {  
-      xPos = xPos + 1;         // CW
-    } 
-    else {
-      xPos = xPos - 1;         // CCW
-    }
-  }
-  // Look for a high-to-low on channel B
-  else { 
-    // check channel B to see which way encoder is turning  
-    if (digitalRead(encoder0PinA) == LOW) {   
-      xPos = xPos + 1;          // CW
-    } 
-    else {
-      xPos = xPos - 1;          // CCW
-    }
-  }
-}
 
